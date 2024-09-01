@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Бесплатный донат в CoolAnarchy</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    #video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #play-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: #fff;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    #troll-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: #fff;
+      z-index: 1;
+      display: none;
+    }
+
+    video {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="video-container" style="background-image: url('your-video-thumbnail.jpg');">
+    <div id="play-text">Нажми чтобы получить бесплатный донат</div>
+    <div id="troll-text">Ты затроллен!</div>
+  </div>
+
+  <script>
+    // Флаг, указывающий, что видео находится в полноэкранном режиме
+    let isFullscreen = false;
+
+    // Переключение в полноэкранный режим
+    function toggleFullScreen() {
+      var videoContainer = document.getElementById('video-container');
+      if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+          videoContainer.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else if (videoContainer.msRequestFullscreen) {
+          videoContainer.msRequestFullscreen();
+        }
+        isFullscreen = true;
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+        isFullscreen = true;
+      }
+    }
+
+    // Запуск полноэкранного режима и воспроизведения видео при клике на надпись
+    var playText = document.getElementById('play-text');
+    playText.addEventListener('click', function() {
+      toggleFullScreen();
+      var videoContainer = document.getElementById('video-container');
+      videoContainer.style.backgroundImage = 'none';
+      playText.style.display = 'none';
+      var video = document.createElement('video');
+      video.src = 'test.mp4';
+      video.autoplay = true;
+      video.loop = true;
+      video.controls = false;
+      video.width = '100%';
+      video.height = '100%';
+      videoContainer.appendChild(video);
+
+      // Обработчик события окончания воспроизведения видео
+      video.addEventListener('ended', function() {
+        var trollText = document.getElementById('troll-text');
+        trollText.style.display = 'block';
+      });
+    });
+
+    // Блокировка события "Назад" на мобильных устройствах
+    window.addEventListener('popstate', function(event) {
+      if (isFullscreen) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
+
+    window.addEventListener('onbeforeunload', function(event) {
+      if (isFullscreen) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    });
+
+    // Возврат в полноэкранный режим при попытке выйти из него
+    document.addEventListener('fullscreenchange', function() {
+      if (!document.fullscreenElement && isFullscreen) {
+        toggleFullScreen();
+      }
+    });
+  </script>
+</body>
+</html>
